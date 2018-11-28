@@ -1,0 +1,42 @@
+<html>
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['gantt']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('string', 'Resource');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+
+      data.addRows([
+        ['Error Guessing', 'Error Guessing', 'initial', new Date(2018, 4, 1), new Date(2018, 6, 6), null, 0, null],
+        ['Use Case Testing', 'Use Case Testing', 'next', new Date(2018, 4, 23), new Date(2018, 9, 18), null, 0, null],
+        ['Modified Orthogonal', 'Modified Orthogonal', 'nextntext', new Date(2018, 7, 15), new Date(2018, 8, 1), null, 0, null],
+      ]);
+
+      var options = {
+        height: 800,
+        gantt: {
+          trackHeight: 35
+        }
+      };
+
+      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+  </script>
+</head>
+<body>
+  <div id="chart_div"></div>
+</body>
+</html>

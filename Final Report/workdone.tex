@@ -1,0 +1,129 @@
+\chapter{Work Done}\label{C:workdone}
+
+\section{Initial steps}
+
+The initial stages of the project consisted of familiarising myself with the 42 language and as I had no previous knowledge of the language this would prove to be extremely important. I started by reading the 42 tutorial \cite{L42}. After this I started to get some hands on experience by writing very basic and small 42 programs. Writing these programs uncovered a few small bugs but the primary value of them was learning how to use the language which would allow me to create more complex programs and push the boundaries of the language later on. 
+
+\subsection{Bug areas}
+Once I had familiarised myself with the language, Dr Servetto suggested a few areas of the language where he thought it likely that it would be possible to find bugs.
+\begin{itemize}
+	\item{Parser}
+	\item{Type system}
+	\item{Metaprogramming}
+	\item{Reduction}
+	\item{Native interfacing}
+\end{itemize}
+\subsection{Bug types}
+Dr Servetto also laid out the criteria for what constituted a bug and these criteria are fairly simple and straightforward;
+\begin{itemize}
+	\item{A Java error is produced}
+	\item{42 behaviour does not match specifications}
+\end{itemize}
+\subsubsection{Java errors}
+The first criterion is fairly self-explanatory. If stderr reports a Java exception or error we classify it as a 42 bug as all errors or exceptions should be handled by the 42 compiler. This not true in all cases, and in sometimes a Java error being produced reveals a deeper problem. An example of this is in Figure 3.1. We would expect the code in Figure 3.1 to throw some sort of type error as $s$ is an immutable object as it is not prefaced with the \textcolor{blue}{$var$} keyword. However instead of this expected behaviour, this code snippet will throw a Java AssertionError. If we look at the Java stack trace we can see that an assertion is violated in the type system. The purpose of this assertion is to make sure that a state that we should never reach (when behaviour is as expected) is not reached. Therefore we can come to the conclusion that since this assertion is violated we have reached a state that should not be reached. We can then come to the conclusion that we have an error that is not just 42 failing to handle its own error, it also shows there is an implementation error in the compiler.
+
+\begin{figure}[H]
+\begin{42listing}
+	C: {
+		s = 12Num // s is immutable as variables are immutable by default.
+		s := 13Num // Note Pascal style for updating variables.
+		return ExitCode.normal()
+	}	
+\end{42listing}
+\captionsetup{format = hang}
+\caption[Update immutable bug code]{The update immutable bug. This bug throws a Java AssertionError and is on the TODO list to be fixed.}
+\end{figure}
+
+\subsubsection{Behaviour mismatch}
+This criterion is significantly more broad than the previously mentioned one. This includes 42 behaviour that does not match with the specifications laid out for 42 (Figure 3.2 is an example of this) \cite{L42}, and behaviour that is not mentioned in the specifications (Figure 3.3 is an example of this).
+
+\begin{figure}[h]
+\begin{42listing}
+	C: {
+		s = return ExitCode.normal()
+	}
+\end{42listing}
+\captionsetup{format = hang}
+\caption[Assigning an exit code to a variable]{Assigning an exit code to a variable. According to the specifications this should work correctly}
+\end{figure}
+
+\begin{figure}[h]
+\begin{42listing}
+	C: {
+		Num n = 1Num / 0Num // n has the value of 1/0.
+		Debug(n) // This will print 1/0 to the console.
+	} // No error is thrown by this code.
+\end{42listing}
+\captionsetup{format = hang}
+\caption[42 division by zero]{42 division by zero. This should not be allowed and we would expect it throw some sort of math error.}
+\end{figure}
+~\\
+The behaviour for the snippet of code in figure 3.3 is not specifically defined in the 42 specifications \cite{L42Main}. Therefore we must err to our best judgment on a case by case basis. In this specific case it is clear that this is not how the code should behave, it is nonsensical to allow division by zero therefore this should result in both the specifications and implementation being changed.
+\begin{figure}[h]
+\begin{lstlisting}
+	class A {
+		static void a() {
+			int n = 1 / 0; 
+			System.out.println(n);
+		}
+	}
+\end{lstlisting}
+\captionsetup{format = hang}
+\caption[Java division by zero]{Java division by zero. The equivalent code of figure 3.3. This will throw an ArithmeticException which is the behaviour we would expect in 42.}
+\end{figure}
+
+~\\
+
+\section{Testing}
+
+For this project two main types of tests were written. Firstly, various general tests that did not target any specific area of the compiler were written. This kind of test would generally be implementing simple, well known program in 42. Examples of this include finding the maximum value in an array or finding if an array contains a value (see Appendix A). These tests found roughly half the bugs (6) but made up around 70\% of the total tests written (196). This means that compared to targeted tests which found 8 bugs, the more general tests have a lower chance of exposing a bug. Though it must be noted that this is skewed by the fact that many of the general tests were written when initially familiarising myself with the language.
+
+After a potential bug was found I would attempt to minimise the code required to replicate bug then a bug report (an example of a bug report can been seen in Appendix B) would be sent to Dr Servetto who would give feedback on the bug, such as if it was already know, the likely cause, and how difficult it would be to fix. If a bug was of high priority Dr Servetto would fix it and the bug report could be closed. If it was not of a high enough priority it would be put in the "TODO list". This meant the bug would then be known and could be fixed in the future. 
+
+
+
+~\\
+Some comments can be made about the quantity of bugs (see table 3.1) found over the course of this project. The first thing that stands out is that the total quantity of bugs found is not as high as hoped. This is primarily due to the absence of automated testing of the compiler, all testing was done manually. On average around 10 tests have been written for each bug found (142 tests written, 14 bugs found). An additional interesting point to note includes the total lack of metaprogramming bugs discovered. This is due to no tests having been written that use the 42 metaprogramming system. Reasons for this include not having very much experience with metaprogramming and not being needed in writing simple programs. Future testing of metaprogramming in 42 will require specifically tailored tests and more in depth research into metaprogramming. Another topic worthy of discussion of the high quantity of bugs in the "Miscellaneous" category. This category, as described earlier, includes all the bugs that were easily classified into the other categories or simply did not fit. Examples of this include the division by zero bug discussed earlier in this chapter (see figure 3.3). Therefore one could probably expect a high number of this category of bugs, especially due to the lack of automated testing so far.
+
+\section{Conclusion}
+A lesson that has been learnt over the course of this project is that compiler testing is very different when contrasted to more normal testing. Compiler bugs are considered to be difficult to find \cite{Leroy:2009}, and attempting to find bugs in the 42 compiler was no exception. Some bugs were found by programming fairly simple programs, but the majority were found through pushing the boundaries of what one might expect a programmer to do in the normal usage of a language. Examples of this include the "underscore bug". In 42 an underscore character is a valid variable name, and if an object that was passed to a method as a parameter was called  "\_" and "\_" was not in scope when the method was called, a Java NullPointerException would be thrown (see Figure 3.5 for full code snippet). This is clearly unintentional behaviour and a bug in the 42 compiler.
+
+\begin{figure}[h]
+\begin{42listing}
+
+	A: {
+		class method Any m(Any that) that // Any is supertype of all objects, like Object in Java.
+	}
+	
+	B: {
+		a = a.m(_) // Underscore is a valid variable name but there is no variable with this name in scope.
+		return ExitCode.normal() // We need to declare an exit status on any program.
+	}
+	
+\end{42listing}
+\caption[The underscore bug] {The underscore bug. This code would throw a NullPointerException in Java and it was subsequently fixed to produce the correct 42 error.}
+\end{figure}
+~\\
+This project has shown, that while writing simple programs may find some fairly simple bugs, a far larger quantity of bugs will be found by specifically targeting different areas of the compiler or by writing unusual code. An additional reason to focus on these two 
+methods is that many (but most certainly not all) of the bugs that could be found by writing simple or standard programs have already been found and fixed. 
+
+An advantage of working with the 42 compiler versus a C or C++ compiler is that a significant number of compiler bugs can be attributed to aggressive compiler optimisation \cite{gccbugs}\cite{opLecture}\cite{stackOp}\cite{lwnNull}. At the current time optimisation is not a priority for the 42 compiler at the present time. A major reason for this is that some language features are still being implemented and numerous bugs are still being found, as can be seen by the results of this project. The lack of aggressive compiler optimisation meant that some fairly common classes of compiler bugs have not found at all. This mainly includes bugs that are present at higher levels of optimisation but not at lower levels. This is clearly seen in bug reports for $gcc$ where bugs are found when a higher levels of optimisation flag is passed e.g. -\textit{O3} and then the bugs are not found at lower level e.g. -\textit{O$0$} or -\textit{O1}. 
+
+After looking over the bugs found so far, Dr Servetto and I came up with eight different categories for the classification of bugs found so far. These categories are roughly equivalent to the areas where Dr Servetto thought it likely I would find bugs in the compiler as per the list at the start of this chapter. This list of categories can be seen in the list below.
+
+\begin{itemize}
+	\item{Syntax is too liberal}
+	\item{Syntax is too restrictive}
+	\item{Type system is too liberal}
+	\item{Type system is too restrictive}
+	\item{Metaprogramming is too liberal}
+	\item{Metaprogramming is too restrictive}
+	\item{Reduction}
+	\item{Miscellaneous}
+\end{itemize}
+~\\
+Most of these categories are fairly self-explanatory but two of the categories require a brief explanation. Firstly a bug that came under the "Metaprogramming is too liberal" category would generally mean that the code produced unexpected behaviour as a result of metaprogramming. An example of this would a metaprogramming operation $O$ that takes well-typed code and produces non-well-typed code. Correct behaviour would result in $O$ taking well-typed code and producing well-typed code. A further category that requires some clarification is  the "Reduction" category. This includes the 42 compiler producing wrong Java behaviour and the compiler producing non-well-typed code. Finally, the "Miscellaneous" category includes all the bugs that did not fit nicely under any other category. Note that these categories are not final and could change in the future. Additionally some of the bugs uncovered over the course of this project do not fit nicely into a single category or would be hard to categorise accurately so are generally placed in the miscellaneous category.
+
+
+
+

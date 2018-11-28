@@ -1,0 +1,38 @@
+ \chapter{Conclusions and Future Work}\label{C:concl}
+ 
+\section{Future Work}
+
+The work undertaken over the course of this project has found a significant number of bugs in the 42 compiler, but it is evident that there is further work that could be carried out to follow on from this project, and it could take the lessons learnt and apply them.
+
+ \subsection{Java to 42 Transpiler \label{trans}}
+
+Linus's Law states that "given enough eyeballs, all bugs are shallow" \cite{cathedral}. This law shows us that the more a program is used, the more bugs are discovered in the program \cite{wang}. This means that more use of the 42 compiler would probably mean the discovery of more bugs, and a good way to use the 42 compiler more is to have a large number of programs to compile and run. A possible way of getting 42 programs could be to create a transpiler with 42 as the target language.
+
+A transpiler, also known as a source-to-source compiler, is a tool that takes source code written in a programming language and produces equivalent code in another language \cite{scotch}. The main difference between a compiler and a transpiler is that a compiler converts high-level source code to low-level instructions that can then be run on some target system \cite{simple}. A transpiler takes source code written in a programming language and converts it to equivalent code in another language that has a similar level of abstraction, and this means that the output code of a transpiler is generally still human readable \cite{scotch}.
+
+A good avenue for future work could be the creation of a transpiler that targeted 42 from another high-level language. 
+
+This project has relied on the creation of 42 programs which were then compiled and run to find bugs, and it has been quite successful, especially given the relatively small number of programs written (around 2,500 programs). A logical continuation of this project could be to continue to create 42 programs and attempt to run and compile them, but programs would still be created relatively slowly. Automatic creation of 42 programs is an additional option, but it would be difficult to create syntactically correct 42 code without the creation of a specific tool that would require large amounts of work and expertise. A potential solution to the lack of 42 programs is converting source code from other languages to 42 source code. The 42 code would then be compiled and run, and the behaviour would be checked against the original code for bugs. If the behaviour or output differs, further investigation would be required to check if the output differs due to a bug in the 42 compiler. 
+
+The development of a 42 transpiler would present some issues. While it would be helpful in the creation of 42 tests, since it would be converting another high-level language to 42, it would mean that some parts of the 42 language would not be tested such as the metaprogramming features or parts of the type system. This is because there is unlikely to be code that would transpiled into 42 metaprogramming, and advanced parts of the type system would be unlikely to be tested. Overall, a transpiler would not produce code that tests the unique or ``special'' parts of the 42 language. 
+
+A reasonable choice for a source language for the transpiler would be Java. This is due to two main reasons; firstly, Java is a commonly used language with a large number of programs written in it, which would give a large pool of programs which could be transpiled to 42 programs. Secondly, transpilation of Java code to another high level language is not a new problem, and examples include J2Eif (Java to Eiffel) \cite{Java2ef} and Google Web Toolkit (Java to JavaScript) \cite{GWT}.
+
+
+\subsection{Model Checking}
+
+As seen in Section \ref{meta}, very few bugs were found in the metaprogramming system of 42. This means that future work could be prioritised in this area, especially due to the fact that the 42 transpiler as suggested in Section \ref{trans} would not test the 42 metaprogramming features. 
+
+A suggested solution would be to use some sort of model checking to model all outcomes of metaprogramming in a given program. A tool could be created that would take a 42 program with multiple classes, and then all metaprogramming operators (adding, extending, etc.) could be applied over the set of methods. This would allow for fairly easy exhaustive testing of the 42 metaprogramming features, and it could be automated. It would hopefully provide much needed testing of the metaprogramming features of 42, which were not thoroughly tested by this project.
+
+\section{Conclusion}
+
+The goal of this project was to find bugs in the 42 compiler through creating short programs to find corner cases of the 42 implementation. A black-box testing methodology was used for this project, and numerous tests were created with three different black-box testing methods and a tool created to turn programs written in 42 into JUnit tests. The testing mainly focused on use case testing to create tests for this project, with error guessing making up the majority of the remainder of tests written. A planned orthogonal squares method did not work as well as expected and was therefore discontinued.
+
+The testing over the course of the project tests identified thirty-two previously unknown bugs in the 42 compiler. In terms of testing methods, 78\% of bugs were found with use case testing, and 22\% were found with error guessing. This means that use case testing was the most effective and important method of testing employed during this project.
+
+It is estimated that at least 2,500 tests were written over the course of this project. With thirty-two bugs found, on average, it took seventy-eight tests to find each bug. This gives a probability of 1.28\% of any given test finding a bug in the 42 compiler, which shows the testing methods were effective, especially in the case of testing a compiler.
+
+The bugs that were found were split into nine different categories depending on the nature of the bug. Categories included the syntax of the language, the type system, the metaprogramming features, reduction to Java bytecode, standard library bugs, and a miscellaneous category. The most common category of bugs found were syntax bugs followed by standard library bugs, and then reduction and miscellaneous bugs, and this shows that the testing was either particularly effective in these areas, or there were more unidentified bugs in these areas. There was only a single bug found in the metaprogramming category, and this was primarily due to a lack of testing targeting the 42 metaprogramming features rather than a lack of bugs in this area.
+
+Overall the project was successful due to the quantity of bugs found, and the effectiveness of the tests created in terms of the quantity of tests written to bugs found. However the lack of bugs found in the metaprogamming features should be noted, as this showed that the testing was less effective in this area, and future work could be focused more heavily into this area of the compiler.

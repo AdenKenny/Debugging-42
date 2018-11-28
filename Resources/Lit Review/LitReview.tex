@@ -1,0 +1,143 @@
+\documentclass[11pt, a4paper, twoside, openright, twocolumn]{report}
+
+\usepackage{float} % lets you have non-floating floats
+\setlength{\columnsep}{1cm} % Set our column width.
+\usepackage{url} % for typesetting urls
+\usepackage{amsmath}
+\begin{document}
+
+\begingroup
+\hyphenpenalty 2500 %Stop linebreaking so much.
+\exhyphenpenalty 2500
+
+\section*{1. Introduction}
+This literature review is produced for the 'Debugging 42' project for the ENGR 489 course. Compiler testing can a difficult and time consuming process
+and Leroy \cite{Leroy:2009} states that compiler-introduced bugs are widely considered to be extremely difficult to find and track down.
+
+This literature review will explore the current approaches to testing and debugging of compilers and will then explore how ideas and tools in the current literature can
+be applied to the 'Debugging 42' project.
+
+\section*{2. Verified compiler}
+Harrison \cite{Harrison:2003} states that testing by itself is usually inadequate to guarantee correctness due to the large number of possible inputs and program states.
+This is especially true in case of a compiler which has a practically infinite number of possible inputs and states. Therefore we can conclude that compilers are highly likely to contain bugs
+as most large scale programs will contain bugs \cite{Harrison:2003}.
+
+A logical idea then could be to use formal specifications and verification to produce our goal of a bug-free compiler. Written code itself could be bug free but
+bugs in the compiler could change the way the code works after being compiled and invalidate all testing and verification on the source code itself.
+Formal verification has a history of use in many areas including CPU design \cite{Harrison:2003} \cite{OLeary2004}, 
+smart contracts \cite{8328737} (INSERT MORE HERE) but verification of a compiler is less explored than some of the previously mentioned areas.
+Although this does not mean that research has not been published in this area. 
+The first proof was published in 1967 \cite{McCarthy1967} 
+
+
+\subsection*{2.1. Leroy's semantic preservation}
+Leroy \cite{Leroy:2009} presents a compiler called CompCert for a large subset \cite{Blazy:2006} of the C language. 
+
+
+This paper \cite{Leroy:2009} presents a formally verified compiler that provides some semantic preservation.
+This compiler produces a compiled program $C$ from source code $S$. Then introduced is $B$, an observable behaviour.
+Leroy then introduces some notions of semantic preservation using these definitions. Firstly,
+\begin{equation}
+\forall B, \; S \Downarrow B \Longleftrightarrow C \Downarrow B
+\end{equation}
+This notion states that the observable behaviours of the source program and the compiled program are exactly the same.
+Leroy states that is the strongest notion of semantic preservation but explains that it is too strong to be a usable notion,
+as if the source language is not deterministic compilers can select differing behaviours for the source program. An example of
+evaluation of order of expressions in C compilers is provided for the notion being too strong.
+Leroy then introduces some weakened or relaxed definitions of (1) that are more useful.
+Leroy states two of these as the most useful, (2) and (3).
+\begin{equation}
+S \; \textbf{safe} \Longrightarrow (\forall B, \; C \Downarrow B \Longrightarrow S \Downarrow B)
+\end{equation}
+Leroy defines $S \; \textbf{safe}$ as meaning that "none of the possible behaviours of $S$ is a 'going wrong' behaviour"\cite{Leroy:2009}. Therefore we can 
+define this "weakened" notion as if $S$, the source program, does not go wrong, then neither does C, the compiled program.
+Leroy then states that the CompCert compiler focuses on source and target languages that are deterministic. Then with this considered Leroy introduces
+the idea that in the conditions that both the source and target languages are deterministic that we can prove (2) is equivalent to:
+\begin{equation}
+\forall B \notin \textbf{Wrong}, \; S \Downarrow B \Longrightarrow C \Downarrow B
+\end{equation}
+Where $\textbf{Wrong}$ is the "set of 'going wrong' behaviors" \cite{Leroy:2009}. Leroy states that this property is generally easier to prove
+with a proof by induction on the execution of S, the source program. 
+\subsection*{2.2. Verified compiler} 
+Leroy then introduces some approaches to establish that a given compiler preserves the semantics of the source code as discussed in section 2.1. 
+Leroy models the compiler as a total function \textit{Comp} from a source program $S$ to either code that compiles,
+
+$(\textit{Comp}(S) = \textbf{OK}(\textit{C}\,))$
+
+or code that throws a compile-time error,
+
+$(\textit{Comp}(S) = \textbf{Error})$
+
+Leroy states that a compile-time errors are when the compiler cannot produce code, such as syntax or type errors, but also introduces an important
+caveat, a compile-time error is also thrown if the code exceeds the scope or capabilities of the given compiler. 
+
+This caveat becomes important when discussing 
+Leroy's CompCert, as mentioned previously, the compiler supports "a large subset of the C language" \cite{Leroy:2009}. This subset excludes operators related to structs and
+unions, unstructured statements such as \textbf{goto}, \textbf{switch}, and \textbf{longjmp}, block-scoped local variables, and \textbf{static} variables.
+Further information on this subset can be obtained from  Blazy et al. \cite{Blazy:2006}.
+
+Leroy states that a compiler \textit{Comp} can be to be verified if has a formal proof of the property:
+\begin{equation}
+\forall S,C, \quad Comp(S) = \textbf{OK}(C) \Longrightarrow S \approx C
+\end{equation}
+Or that a fully verified compiler either throws an error or produces a compiled program that satisfies the desired correctness property.
+Leroy states that a compiler that always fails:
+\begin{equation}
+\forall S, \; Comp(S) = \textbf{Error}
+\end{equation}
+Does verify, even if it is useless. Leroy states that no matter if the compiler succeeds in compiling the source programs is not actually an issue of correctness,
+but an issue of the quality of implementation. This is important to the testing of other compilers as Leroy states \cite{Leroy:2009} that a quality of implementation issue must
+be addressed by "non-formal methods such as testing" \cite{Leroy:2009}. Leroy then states that the most important feature of a verified compiler is that it
+does not silently produce incorrect code which can only be \textit{guaranteed} with formal verification.
+
+\subsection*{2.3. Further useful definitions}
+We can define some useful properties of compiled code from definitions in section 2.1. 
+Firstly using the same definitions from section 2.1,
+\begin{equation}
+\forall B, \; \neg  (S \Downarrow B \Longleftrightarrow C \Downarrow B)
+\end{equation}
+We can introduce this definition. This describes the case of a compiler bug, or when the compiler produces compiled code that exhibits different observable
+behaviours than the source code that was used to create the compiled program. This definition is a clear extension of (1) where the equivalence is negated to 
+account for the observable behaviours differing.
+
+Next we work with (2) and modify this definition to work for unsafe behaviour.
+\begin{equation}
+S \; \textbf{unsafe} \Longrightarrow \neg (\forall B, \; C \Downarrow B \Longrightarrow S \Downarrow B)
+\end{equation}
+We can define $S$ \textbf{unsafe} as the opposite of $S$ \textbf{safe} from (2) or that some of the behaviours of $S$ are 'going wrong'
+behaviours. We can further modify this definition as to make it easier for us to use:
+\begin{equation}
+S \; \textbf{unsafe} \Longrightarrow (\exists B, \; C \Downarrow B \not \Longrightarrow S \Downarrow B)
+\end{equation}
+Or that $S$ \textbf{unsafe}  as if there exists an observable behaviour where the behaviour of the source code does not match the behaviour of the
+compiled code. 
+
+We can define a compiler introduced bug as (8), as a compiler introduced bug can be described as when the observable behaviours of the source code,
+in this case $S$, do not match the observable behaviours of the compiled executable, $C$. Note the use of "observable behaviour", in the case of nonmatching unobservable behaviour \textit{UB}:
+\begin{equation}
+\forall \mathit{UB}, \; C \Downarrow  \mathit{UB} \not \Longrightarrow S \Downarrow \mathit{UB}
+\end{equation} 
+Where for all the unobserved behaviours belonging to compiled code do not imply all the unobserved behaviours in the source code. We can also slightly modify
+our definition by saying that for all the unobserved behaviours belonging to compiled code do not \textit{necessarily} imply all the unobserved
+behaviours in the source code. Whereas as (1) states that observed behaviours in the compiled program \textit{must} imply observed behaviours in the
+source program.
+\subsection*{2.4 TEMP TITLE}
+Overall the CompCert compiler is an interesting project and has information that could be used in the testing and debugging of a compiler it uses a formal verification
+approach to the problem and there are some issues with this approach if it was to be applied to debugging the 42 compiler. If Leroy's approach \cite{Leroy:2009}
+ was to be applied to a different language rather than the subset of C that CompCert compiler uses some issues may arise. 
+Firstly the compiler produces code only for PowerPC, a RISC instruction set architecture (ISA). 
+Targeting other ISAs may prove to be more difficult especially if dealing with a non-RISC \cite{Patterson:1980} ISA. This would be the case with most 42 programs which would 
+presumably primarily target the x86 ISA.
+
+Secondly since the CompCert compiler only works for a subset of C, it may be more difficult to produce a verified compiler for other languages especially considering only a subset
+of C is supported and C is considered to a fairly simple language \cite{Kernighan}. An additional considering while considering language complexity and its relationship to the difficulty of
+verifying a compiler is that 42 is purely object-orientated language \cite{Servetto:L42}. While C can be used in an object-orientated way \cite{OOPinC}, it does not support some more advanced
+object-orientated features such as inheritance. These more advanced object orientated features that are present in 42 and 42's support for metaprogramming would mean that it would
+be extremely difficult to create a verified compiler for 42. 
+
+\endgroup
+\nocite{*}
+\bibliographystyle{ieeetr}
+%\bibliographystyle{acm}
+\bibliography{citations}
+\end{document}

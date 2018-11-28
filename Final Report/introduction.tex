@@ -1,0 +1,26 @@
+\chapter{Introduction}\label{C:intro}
+
+\makeatletter
+\renewcommand{\@chapapp}{}% Not necessary...
+\newenvironment{chapquote}[2][2em]
+  {\setlength{\@tempdima}{#1}%
+   \def\chapquote@author{#2}%
+   \parshape 1 \@tempdima \dimexpr\textwidth-2\@tempdima\relax%
+   \itshape}
+  {\par\normalfont\hfill--\ \chapquote@author\hspace*{\@tempdima}\par\bigskip}
+\makeatother
+
+42 is a statically typed, high-level programming language designed to allow the use and composition of millions libraries simultaneously \cite{L42}. The current implementation of 42 is written in Java. The 42 compiler is a large and complex piece of software which consists of over 70,000 lines of code. It is highly likely that bugs exist in the implementation of practically any language \cite{arnabold}, and the main way to find these bugs is through testing. Compiler bugs present a major problem as in the worst case scenario they can introduce bugs into previously bug-free code when it is compiled; causing the and programmer to spend a significant amount of time and effort attempting to track down the bug in their own code, rather than in the compiler. Compiler-introduced bugs are considered to be extremely difficult to find and track down \cite{Leroy:2009}. It is therefore important to locate bugs that exist in a compiler.
+
+The goal of this project was to create programs that would try "to leverage corner cases of the implementation and discover bugs" \cite{outline}. From this it was decided that the main focus of this project was the designing, writing, compiling, and running of short programs. These programs were then converted into automated tests, minimised, and added to the 42 test suite. A black-box testing methodology \cite{ostrand} was chosen for this project to develop tests as the gathered requirements indicated that the system as whole should be tested. This strongly suggested a black-box approach should be taken. Alternative testing methodologies were considered for this project, but for various reasons these alternative approaches were found to be inadequate, inferior to the chosen approach, or not suited to the requirements of the project. These alternative approaches included a white-box testing methodology, or a more automated, fuzzing focused methodology.
+ 
+
+\section{Contributions}
+
+The contributions of this project are:
+
+\begin{enumerate}
+	\item{The creation of numerous 42 programs that were turned into automated tests.}
+	\item{A reduction in the number of unknown bugs in the 42 compiler.}
+	\item{A tool to turn 42 programs into automated tests.}
+\end{enumerate}
